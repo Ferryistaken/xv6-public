@@ -19,6 +19,16 @@ static void consputc(int);
 
 static int panicked = 0;
 
+void
+c_kputs(const char *s)
+{
+  if(s == 0)
+    return;
+  for(; *s; s++){
+    consputc(*s);
+  }
+}
+
 static struct {
   struct spinlock lock;
   int locking;

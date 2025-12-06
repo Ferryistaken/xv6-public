@@ -10,6 +10,30 @@ struct sleeplock;
 struct stat;
 struct superblock;
 
+// external rust
+extern void rust_test(void);
+void rust_tx_frame(const uchar *buf, int len);
+
+// pci.c
+void pci_scan_bus0(void);
+uint pci_config_read32(uint bus, uint slot, uint func, uint offset);
+void pci_config_write32(uint, uint, uint, uint, uint);
+
+// e1000.c
+void  e1000_init(void);
+void  e1000_intr(void);
+int   e1000_tx(const void *data, int len);
+int   e1000_rx_poll(uchar *buf, int maxlen);
+extern void rust_net_rx(const unsigned char *buf, int len);
+extern void rust_tx_frame(const unsigned char *buf, int len);
+
+int  net_listen(int port);          // start listening on TCP port
+int  net_accept(void);              // returns 1 if a connection is established, 0 if not yet, -1 on error
+int  net_recv(void *buf, int n);    // returns bytes read, 0 if no data, -1 on error
+int  net_send(void *buf, int n);    // returns bytes sent, 0 if would-block, -1 on error
+int  net_close(void);               // close current connection
+
+
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);
@@ -173,6 +197,7 @@ void            uartputc(int);
 // vm.c
 void            seginit(void);
 void            kvmalloc(void);
+int             mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm);
 pde_t*          setupkvm(void);
 char*           uva2ka(pde_t*, char*);
 int             allocuvm(pde_t*, uint, uint);

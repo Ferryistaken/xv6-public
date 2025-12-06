@@ -40,6 +40,21 @@ outsl(int port, const void *addr, int cnt)
 }
 
 static inline void
+outl(ushort port, uint data)
+{
+  asm volatile("outl %0,%1" : : "a" (data), "d" (port));
+}
+
+static inline uint
+inl(ushort port)
+{
+  uint data;
+  asm volatile("inl %1,%0" : "=a" (data) : "d" (port));
+  return data;
+}
+
+
+static inline void
 stosb(void *addr, int data, int cnt)
 {
   asm volatile("cld; rep stosb" :

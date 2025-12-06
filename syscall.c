@@ -103,6 +103,11 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sys_net_listen(void);
+extern int sys_net_accept(void);
+extern int sys_net_recv(void);
+extern int sys_net_send(void);
+extern int sys_net_close(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -126,6 +131,11 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_net_listen]  sys_net_listen,
+[SYS_net_accept]  sys_net_accept,
+[SYS_net_recv]    sys_net_recv,
+[SYS_net_send]    sys_net_send,
+[SYS_net_close]   sys_net_close,
 };
 
 void

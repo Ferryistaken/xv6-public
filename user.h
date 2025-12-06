@@ -23,6 +23,13 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+// networking
+int  net_listen(int port);           // start listening on TCP port
+int  net_accept(void);              // returns 1 if a connection is established, 0 if not yet, -1 on error
+int  net_recv(void *buf, int n);    // returns bytes read, 0 if no data, -1 on error
+int  net_send(void *buf, int n);    // returns bytes sent, 0 if would-block, -1 on error
+int  net_close(void);               // close current connection
+
 
 // ulib.c
 int stat(const char*, struct stat*);
