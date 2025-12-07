@@ -93,19 +93,15 @@ e1000_init(void)
 {
   ioapicenable(IRQ_E1000, 0);
   uint bus = 0;
-  uint slot = 3;   // from your QEMU config: -net nic,model=e1000 puts it here
+  uint slot = 3;
 
-  // 1) Read BAR0 from PCI config space
   uint bar0 = pci_config_read32(bus, slot, 0, 0x10);
   uint mmio_pa = bar0 & ~0xF;
 
-  // Map one page of MMIO into kernel virtual address space.
-  // Align to page, use P2V to choose a kernel VA.
   uint pa_page = mmio_pa & ~(PGSIZE - 1);
   void *va_page = (void*)P2V(pa_page);
   uint mmio_size = 0x4000; // 4 pages
 
-  // Mark as present + writable + uncached (PCD/PWT if you want to be fancy).
   int perm = PTE_W | PTE_P;
 
   if(mappages(kpgdir, va_page, mmio_size, pa_page, perm) < 0){
@@ -116,12 +112,9 @@ e1000_init(void)
   // Reload CR3 so CPU picks up new mapping
   lcr3(V2P(kpgdir));
 
-  // Now it is safe to compute the exact virtual address
   e1000_regs = (volatile uint *)P2V(mmio_pa);
-
   cprintf("e1000: BAR0=0x%x mmio_pa=0x%x regs=%p\n", bar0, mmio_pa, e1000_regs);
 
-  // 2) Basic sanity: print STATUS (optional, but nice)
   uint status = e1000_read_reg(E1000_STATUS);
   cprintf("e1000: status=0x%x\n", status);
 
@@ -138,7 +131,7 @@ e1000_init(void)
 
   cprintf("e1000: PCI CMD=0x%x\n", cmd_lo);
 
-  // 3) Init TX ring
+  // Init TX ring
   int i;
   for(i = 0; i < TX_RING_SIZE; i++){
     tx_ring[i].addr_lo = V2P(tx_bufs[i]);
@@ -158,7 +151,7 @@ e1000_init(void)
   e1000_write_reg(E1000_TDT, 0);
   tx_tail = 0;
 
-  // 4) Init RX ring
+  // Init RX ring
   for(i = 0; i < RX_RING_SIZE; i++){
     rx_ring[i].addr_lo = V2P(rx_bufs[i]);
     rx_ring[i].addr_hi = 0;
@@ -264,7 +257,7 @@ e1000_rx_poll(uchar *buf, int maxlen)
   if((d->status & E1000_RXD_STAT_EOP) == 0){
     cprintf("e1000: RX fragment, dropping (len=%d status=0x%x)\n",
                   d->length, d->status);
-    // n stays 0 → caller won't use this packet
+    // n stays 0 -> caller won't use this packet
     goto rearm;
   }
 
